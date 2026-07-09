@@ -18,7 +18,9 @@ opkg install sing-box kmod-nft-tproxy
 
 ## Install
 
-Copy the `.ipk` to the router and install it:
+Get a prebuilt `.ipk` from the [Releases page](../../releases) — either the
+rolling **Continuous build** (newest, rebuilt every commit) or a **`vX.Y.Z`**
+tagged release. Then copy it to the router and install it:
 
 ```sh
 scp luci-app-homeproxy_*_all.ipk root@192.168.100.1:/tmp/

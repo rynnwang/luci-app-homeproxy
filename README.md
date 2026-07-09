@@ -23,6 +23,17 @@ Almost nothing — and that is the point.
 
 There are **no new features, no UI changes, and no functionality downgrades.**
 
+## Download
+
+Grab a prebuilt `.ipk` from the [Releases page](../../releases):
+
+- **Continuous** — a rolling pre-release rebuilt on **every commit** to
+  `dev`/`master`. Always the newest build; the file name carries the version
+  (e.g. `luci-app-homeproxy_1.0.0~git<date>.<sha>-r1_all.ipk`).
+- **`vX.Y.Z`** — pinned, stable tagged releases.
+
+Then follow [INSTALL.md](INSTALL.md).
+
 ## Why so few changes were needed
 
 iStoreOS 24.10 tracks the OpenWrt 24.10 ABI, and HomeProxy is already built for

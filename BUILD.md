@@ -11,19 +11,34 @@ against OpenWrt **24.10.2 / x86_64** and produces a versioned `.ipk`.
 
 It runs automatically on:
 
-- pushes to `master`/`dev` and PRs that touch the package or build files
-  (produces a downloadable **run artifact**),
-- **version tags** `v*` and published GitHub Releases (builds and **attaches
-  the `.ipk` to a GitHub Release**, creating the release if the tag has none),
+- pushes to `master`/`dev` — builds and updates the rolling **`continuous`**
+  pre-release (always one newest downloadable build), and also uploads a run
+  artifact,
+- PRs that touch the package or build files — build + run artifact only (no
+  release),
+- **version tags** `v*` and published GitHub Releases — builds and publishes a
+  stable **`vX.Y.Z`** release with the `.ipk` attached (creating the release if
+  the tag has none),
 - manual **workflow_dispatch** (optionally choose the OpenWrt version).
 
-Download the artifact from the run's **Summary → Artifacts**, or from the
-release page.
+Download from the [Releases page](../../releases) or the run's
+**Summary → Artifacts**.
 
-### Cutting a release
+### Release channels
 
-A release is **not** created on merge — only a run artifact is. To publish a
-release, push a version tag:
+| Channel | Trigger | Version string | Purpose |
+| ------- | ------- | -------------- | ------- |
+| `continuous` (pre-release) | every push to `dev`/`master` | `1.0.0~git<date>.<sha>` | newest build, always downloadable |
+| `vX.Y.Z` (stable) | pushing a `v*` tag | `X.Y.Z` | pinned, reproducible releases |
+
+The rolling `continuous` release is deleted and recreated on each push, so the
+Releases page never accumulates thousands of entries — exactly one continuous
+build plus your tagged releases.
+
+### Cutting a stable release
+
+The `continuous` pre-release updates on its own. For a pinned stable release,
+push a version tag:
 
 ```sh
 git tag v1.0.0
