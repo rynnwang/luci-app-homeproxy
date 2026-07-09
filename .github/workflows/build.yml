@@ -1,16 +1,11 @@
 name: Build ipk (iStoreOS / OpenWrt 24.10 x86_64)
 
 on:
+  # Branch pushes and version tags. No `paths` filter here: a tag push carries
+  # no file diff, so a paths filter would silently skip release builds.
   push:
     branches: [ master, dev ]
-    paths:
-      - 'htdocs/**'
-      - 'root/**'
-      - 'po/**'
-      - 'patches/**'
-      - 'Makefile'
-      - '.github/scripts/build.sh'
-      - '.github/workflows/build.yml'
+    tags: [ 'v*' ]
   pull_request:
     branches: [ master, dev ]
     paths:
@@ -57,10 +52,14 @@ jobs:
       - name: Derive package version
         id: ver
         run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
+          # On a tag (refs/tags/vX.Y.Z) or a published release, use the tag name
+          # with any leading 'v' stripped. Otherwise leave empty (patch default).
+          if [ "${{ github.ref_type }}" = "tag" ] || [ "${{ github.event_name }}" = "release" ]; then
             echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            echo "release=true" >> "$GITHUB_OUTPUT"
           else
             echo "value=" >> "$GITHUB_OUTPUT"
+            echo "release=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build .ipk
@@ -69,17 +68,22 @@ jobs:
         run: bash .github/scripts/build.sh
 
       - name: Upload build artifact
-        if: github.event_name != 'release'
+        if: steps.ver.outputs.release != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: luci-app-homeproxy-${{ env.OPENWRT_VERSION }}-x86_64
           path: artifacts/*.ipk
           if-no-files-found: error
 
-      - name: Attach to GitHub Release
-        if: github.event_name == 'release'
+      - name: Publish GitHub Release
+        if: steps.ver.outputs.release == 'true'
         uses: softprops/action-gh-release@v2
         with:
+          # Creates the release for this tag if it does not exist yet, then
+          # attaches the .ipk. On a `release: published` event it uploads to the
+          # existing release.
+          tag_name: ${{ github.ref_name }}
           files: artifacts/*.ipk
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
