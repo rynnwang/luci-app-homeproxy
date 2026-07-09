@@ -11,8 +11,10 @@ against OpenWrt **24.10.2 / x86_64** and produces a versioned `.ipk`.
 
 It runs automatically on:
 
-- pushes / PRs that touch the package or build files,
-- published GitHub Releases (the `.ipk` is attached to the release),
+- pushes to `master`/`dev` and PRs that touch the package or build files
+  (produces a downloadable **run artifact**),
+- **version tags** `v*` and published GitHub Releases (builds and **attaches
+  the `.ipk` to a GitHub Release**, creating the release if the tag has none),
 - manual **workflow_dispatch** (optionally choose the OpenWrt version).
 
 Download the artifact from the run's **Summary → Artifacts**, or from the
@@ -20,9 +22,18 @@ release page.
 
 ### Cutting a release
 
-1. Tag and publish a GitHub Release, e.g. `v1.0.0`.
-2. CI derives `PKG_VERSION` from the tag (`v` stripped), builds, and attaches
-   `luci-app-homeproxy_<version>_all.ipk` to the release.
+A release is **not** created on merge — only a run artifact is. To publish a
+release, push a version tag:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+CI then derives `PKG_VERSION` from the tag (`v` stripped), builds, creates the
+`v1.0.0` release if it does not exist, and attaches
+`luci-app-homeproxy_1.0.0-r1_all.ipk` to it. (Publishing a release manually from
+the GitHub UI works too — the same job runs on the `release: published` event.)
 
 ## Option B — build locally
 
