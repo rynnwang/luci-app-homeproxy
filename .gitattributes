@@ -1,0 +1,4 @@
+# Keep build tooling LF-only so it works on Linux CI regardless of checkout host.
+*.sh    text eol=lf
+*.patch text eol=lf
+*.yml   text eol=lf
