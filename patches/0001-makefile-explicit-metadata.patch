@@ -1,0 +1,24 @@
+From: iStoreOS HomeProxy Edition
+Subject: [PATCH] Makefile: declare explicit package metadata for out-of-tree SDK builds
+
+luci.mk normally derives PKG_VERSION from the surrounding LuCI git tree.
+When this package is built standalone against the OpenWrt SDK (no LuCI
+checkout around it), PKG_VERSION is empty and the produced .ipk has no
+version. Declare PKG_VERSION/PKG_RELEASE and standard metadata so the SDK
+build is reproducible. No functional or dependency changes.
+---
+--- a/Makefile
++++ b/Makefile
+@@ -12,6 +12,12 @@
+ 	+kmod-nft-tproxy
+ 
+ PKG_NAME:=luci-app-homeproxy
++PKG_VERSION:=1.0.0
++PKG_RELEASE:=1
++
++PKG_MAINTAINER:=iStoreOS HomeProxy Edition
++PKG_LICENSE:=GPL-2.0-only
++PKG_LICENSE_FILES:=LICENSE
+ 
+ define Package/luci-app-homeproxy/conffiles
+ /etc/config/homeproxy
